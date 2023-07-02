@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket Client</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    
+    input {
+      margin-bottom: 10px;
+    }
+    
+    #messages {
+      height: 200px;
+      overflow-y: scroll;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>WebSocket Client</h1>
+  
+  <div>
+    <label for="message">Message:</label>
+    <input type="text" id="message">
+    <button id="sendBtn">Send</button>
+  </div>
+  
+  <div id="messages"></div>
+
+  <script>
+    const socket = new WebSocket("ws://localhost:3000/ws");
+    const messageInput = document.getElementById("message");
+    const sendBtn = document.getElementById("sendBtn");
+    const messagesDiv = document.getElementById("messages");
+
+    // 웹소켓 연결이 열린 경우
+    socket.onopen = function () {
+      addMessage("WebSocket connection is open.");
+    };
+
+    // 서버로부터 메시지를 받은 경우
+    socket.onmessage = function (event) {
+      const message = event.data;
+      addMessage("Received message from server: " + message);
+    };
+
+    // 웹소켓 연결이 닫힌 경우
+    socket.onclose = function () {
+      addMessage("WebSocket connection is closed.");
+    };
+
+    // Send 버튼 클릭 시 메시지 전송
+    sendBtn.addEventListener("click", function () {
+      const message = messageInput.value;
+      if (message) {
+        socket.send(message);
+        addMessage("Sent message to server: " + message);
+        messageInput.value = "";
+      }
+    });
+
+    // 메시지를 메시지 목록에 추가하는 함수
+    function addMessage(message) {
+      const messageElement = document.createElement("p");
+      messageElement.textContent = message;
+      messagesDiv.appendChild(messageElement);
+    }
+  </script>
+</body>
+</html>
